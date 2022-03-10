@@ -1,0 +1,10 @@
+django
+gunicorn
+django-heroku
+pymongo
+Flask
+Flask-SocketIO
+Flask-WTF
+Jinja2
+numpy
+WTForms

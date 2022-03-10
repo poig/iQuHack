@@ -1,0 +1,13 @@
+<html>
+    <head>
+        <title>Quantum Key Distribution</title>
+    </head>
+    <body>
+        <h1>Enter a Nickname</h1>
+        <form method="POST">
+            {{ form.hidden_tag() }} 
+            {{ form.name.label }}: {{ form.name() }} {% for error in form.name.errors %}{{ error }}{% endfor %}<br>
+            {{ form.submit() }}
+        </form>
+    </body>
+</html>
