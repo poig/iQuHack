@@ -7,7 +7,7 @@ import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import argparse
 
-TOKEN = "API_here"
+TOKEN = "BJafO7EPmvNGMQQPAxg5XdGWS7MC70W1"
 bq = bluequbit.init(TOKEN)
 
 def get_pauli_str(i, n):
@@ -48,12 +48,42 @@ def run_pps(name, path, threshold=1e-4, workers=10):
             for k, v in results_cache.items():
                 bitstring[int(k)] = v['bit']
 
+    # Step 1: Sync with Cloud - find any matching jobs already submitted
+    print(f"  [{name}] Syncing with cloud jobs...")
+    try:
+        # Search for jobs with this name prefix
+        existing_jobs = bq.search()
+        cloud_jobs = {j.job_name: j for j in existing_jobs if j.job_name and j.job_name.startswith(f"{name}_q")}
+        print(f"  [{name}] Found {len(cloud_jobs)} related jobs on cloud.")
+    except Exception as e:
+        print(f"  [{name}] Cloud sync failed: {e}. Proceeding with local cache only.")
+        cloud_jobs = {}
+
+    def process_qubit(i):
+        job_name = f"{name}_q{i}"
+        # Check cache first
+        if str(i) in results_cache:
+            return i, results_cache[str(i)]['bit'], results_cache[str(i)]['val'], None
+        
+        # Check cloud next
+        if job_name in cloud_jobs:
+            job = cloud_jobs[job_name]
+            if job.run_status == "COMPLETED":
+                val = job.expectation_value
+                bit = '1' if val < 0 else '0'
+                print(f"  [{name}] Qubit {i} RECOVERED from cloud.")
+                return i, bit, val, None
+            elif job.run_status == "RUNNING" or job.run_status == "QUEUED":
+                return i, None, None, f"Job {job.job_id} is {job.run_status}"
+            else:
+                print(f"  [{name}] Qubit {i} cloud job failed ({job.run_status}). Re-submitting...")
+
+        # Submit new job if not found or failed
+        return solve_qubit(name, qc, i, n, threshold)
+
     with ThreadPoolExecutor(max_workers=workers) as executor:
-        futures = []
-        for i in range(n):
-            if bitstring[i] is None:
-                futures.append(executor.submit(solve_qubit, name, qc, i, n, threshold))
-                
+        futures = {executor.submit(process_qubit, i): i for i in range(n)}
+        
         for future in as_completed(futures):
             idx, bit, val, err = future.result()
             if bit is not None:
@@ -61,9 +91,10 @@ def run_pps(name, path, threshold=1e-4, workers=10):
                 results_cache[str(idx)] = {'bit': bit, 'val': val}
                 with open(out_file, "w") as f:
                     json.dump(results_cache, f)
-                print(f"  [{name}] Qubit {idx} DONE: {bit} ({val:.4f})")
+                if err is None: # Only print if it was actually calculated/recovered, not just from cache
+                     print(f"  [{name}] Qubit {idx} DONE: {bit} ({val:.4f})")
             else:
-                print(f"  [{name}] Qubit {idx} FAILED: {err}")
+                print(f"  [{name}] Qubit {idx} PENDING: {err}")
 
     if all(b is not None for b in bitstring):
         final_str = "".join(bitstring[::-1])

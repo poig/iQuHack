@@ -1,0 +1,8 @@
+{
+  "bitstring": "1001",
+  "count": 1000,
+  "total_shots": 1000,
+  "time": 2.070722800999647,
+  "strategy": "clifford_simp",
+  "bond_dim": 128
+}
