@@ -121,4 +121,6 @@ if __name__ == "__main__":
         run_mps(args.name, args.path, args.shots, args.bond_dim)
 
 # usage to solve p9 with pps:
-# python cloud_solver.py --name P9_grand_summit --path challenge/P9_grand_summit.qasm --mode pps --threshold 1e-4
+# python solutions/cloud_solver.py --name P9_grand_summit --path challenge/P9_grand_summit.qasm --mode pps --threshold 1e-4
+# python solutions/cloud_solver.py --name P9_grand_summit --path challenge/P9_grand_summit.qasm --mode mps --bond_dim 64
+# python solutions/cloud_solver.py --name P9_simp --path challenge/P9_simplified.qasm --mode mps --bond_dim 256
