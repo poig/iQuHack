@@ -1,5 +1,6 @@
 import bluequbit
 from qiskit import QuantumCircuit
+import numpy as np
 import time
 import json
 import os
@@ -21,7 +22,11 @@ def solve_qubit(name, qc, i, n, threshold):
     job_name = f"{name}_q{i}"
     tags = {"name": name, "qubit": i}
     try:
-        job = bq.run(qc, device="pauli-path", pauli_sum=pauli_sum, job_name=job_name, tags=tags, options={'pauli_path_truncation_threshold': threshold})
+        job = bq.run(qc, device="pauli-path", pauli_sum=pauli_sum, job_name=job_name, tags=tags, 
+                     options={
+                         'pauli_path_truncation_threshold': threshold,
+                         'pauli_path_circuit_transpilation_level': 1
+                     })
         val = job.expectation_value
         bit = '1' if val < 0 else '0'
         return i, bit, val, None
@@ -66,31 +71,38 @@ def run_pps(name, path, threshold=1e-4, workers=10):
         return final_str
     return None
 
-def run_mps(name, path, shots=1000, bond_dim=None):
-    print(f"\n>>> Running MPS Attack on {name} (shots={shots}, BD={bond_dim})")
+def run_mps(name, path, shots=1000, bond_dim=16):
+    print(f"\n>>> Running MPS Marginals on {name} (BD={bond_dim})")
     qc = QuantumCircuit.from_qasm_file(path)
+    n = qc.num_qubits
+    
+    # Construct Z operators for each qubit to compute marginals
+    z_ops = []
+    for i in range(n):
+        z_str = get_pauli_str(i, n)
+        z_ops.append([(z_str, 1.0)])
+    
+    job_name = f"{name}_mps"
     options = {}
     if bond_dim:
         options["mps_bond_dimension"] = bond_dim
     
-    job_name = f"{name}_mps"
-
-
-        
-    job = bq.run(qc, device="mps.cpu", shots=shots, job_name=job_name, options=options)
+    # Run batch expectation value calculation
+    job = bq.run(qc, device="mps.cpu", pauli_sum=z_ops, job_name=job_name, options=options)
     print(f"  [SUBMITTED] Job ID: {job.job_id}")
     
-    # Wait for result? Or return job object?
-    # For now, let's wait because we want the answer.
-    # But for long jobs, we should probably output the ID and exit or poll.
-    # The previous code waited. Let's keep waiting but with status updates.
+    result = job.expectation_value
     
-    result = job.result()
-    counts = result.get_counts()
-    if counts:
-        winner = max(counts, key=counts.get)
-        print(f"  [{name}] Winner: {winner}, {counts[winner]} counts")
-        return winner
+    if result:
+        vals = np.array(result)
+        # Reconstruct: 1 if < 0, else 0
+        bits = (vals < 0).astype(int)
+        
+        # Reverse to match Qiskit bitstring order (qn...q0)
+        final_str = "".join(str(b) for b in bits[::-1])
+        
+        print(f"  [{name}] Reconstructed Bitstring: {final_str}")
+        return final_str
     return None
 
 if __name__ == "__main__":
