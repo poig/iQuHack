@@ -41,10 +41,12 @@ We utilized the BlueQubit SDK to run simulations on high-performance cloud backe
 - `/solutions`: Contains the primary solver scripts used for the successful submissions.
 - `/challenge`: Original QASM circuit files.
 
+---
+**Submission Team: Tan Jun Liang(poig)**
 
 
 
-# iQuHack 2026: Challenge Solutions (P1-P10)
+# iQuHack 2026: Challenge Solutions (P1-P10) 
 
 We have successfully cracked all ten circuits in the **BlueQubit / IBM HQAP Challenge** set using advanced circuit simplification and Matrix Product State (MPS) simulation.
 
@@ -92,7 +94,6 @@ python solutions/solve_circuit.py challenge/P9_grand_summit.qasm --bond-dim 256
 *   **Marginal Attack**: For extreme cases where sampling is flat, our `cloud_solver.py` provides a **Marginal Reconstruction** mode that builds the bitstring qubit-by-qubit from expectation values.
 
 ---
-**Submission Team: poig**
 **Status: All Targets Resized and Solved.**
 1001011101100001100100010010` | 9.9% |
 
@@ -112,6 +113,4 @@ python solutions/solve_circuit.py challenge/P9_grand_summit.qasm --bond-dim 256
 *   **P6 (Low Hill)**: This circuit responded best to approximate transpilation rather than PyZX. We used `approximation_degree=0.99` to reveal the peak.
 *   **Marginal Attack**: For extreme cases where sampling is flat, our `cloud_solver.py` provides a **Marginal Reconstruction** mode that builds the bitstring qubit-by-qubit from expectation values.
 
----
-**Submission Team: poig**
-**Status: All Targets Resized and Solved.**
+
