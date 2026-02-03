@@ -54,7 +54,7 @@ We have successfully cracked all ten circuits in the **BlueQubit / IBM HQAP Chal
 
 
 Thanks for Tushar Pandey providing the solution
-reference to: https://github.com/pandey-tushar/blue_qubit_26_Iquhack/tree/main/results
+reference to: https://github.com/pandey-tushar/blue_qubit_26_Iquhack
 
 The solving strategy leverages the fact that these "obfuscated" circuits are mathematically equivalent to much simpler "peaked" units. Our pipeline bypasses the high depth and non-Clifford noise through a three-stage attack:
 

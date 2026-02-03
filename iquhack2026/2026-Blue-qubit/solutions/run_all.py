@@ -21,7 +21,7 @@ CIRCUIT_OVERRIDES = {
     "P6": {"skip_pyzx": True, "approx_degree": 0.99},
 }
 
-def run_all(qasm_dir: str = "challenge", output_dir: str = "results", shots: int = 1000, bond_dim: int = 32):
+def run_all(qasm_dir: str = "challenge", output_dir: str = "results", shots: int = 1000, bond_dim: int = 16):
     qasm_dir_p = Path(qasm_dir)
     output_dir_p = Path(output_dir)
     output_dir_p.mkdir(exist_ok=True)

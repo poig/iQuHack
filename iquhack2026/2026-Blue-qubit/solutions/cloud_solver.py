@@ -7,7 +7,7 @@ import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import argparse
 
-TOKEN = "BJafO7EPmvNGMQQPAxg5XdGWS7MC70W1"
+TOKEN = "API_here"
 bq = bluequbit.init(TOKEN)
 
 def get_pauli_str(i, n):
