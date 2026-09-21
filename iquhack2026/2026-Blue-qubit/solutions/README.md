@@ -53,8 +53,8 @@ We have successfully cracked all ten circuits in the **BlueQubit / IBM HQAP Chal
 ## Methodology: "Soft Reduction + MPS"
 
 
-Thanks for Tushar Pandey providing the solution
-reference to: https://github.com/pandey-tushar/blue_qubit_26_Iquhack
+Thanks for Tushar Pandey providing the solution for the `solve_circuit.py` discover after the hack that miraculously solved all problem by loop through the pyzx method.
+reference to: https://github.com/pandey-tushar/blue_qubit_26_Iquhack 
 
 The solving strategy leverages the fact that these "obfuscated" circuits are mathematically equivalent to much simpler "peaked" units. Our pipeline bypasses the high depth and non-Clifford noise through a three-stage attack:
 
